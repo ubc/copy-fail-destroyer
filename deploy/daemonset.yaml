@@ -22,7 +22,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: destroyer
-          image: ghcr.io/norskhelsenett/copy-fail-destroyer:0.1.2
+          image: ghcr.io/norskhelsenett/copy-fail-destroyer:0.1.4
           ports:
             - containerPort: 9100
               name: metrics
