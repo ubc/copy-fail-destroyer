@@ -8,7 +8,7 @@ spec:
   source:
     chart: copy-fail-destroyer
     repoURL: ghcr.io/norskhelsenett/helm
-    targetRevision: 0.1.0
+    targetRevision: 0.*
     helm:
       releaseName: copy-fail-destroyer
       valuesObject: {}

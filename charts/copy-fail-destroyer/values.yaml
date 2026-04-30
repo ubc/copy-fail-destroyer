@@ -15,12 +15,12 @@ metrics:
   port: 9100
   prometheusScrape: true
   podMonitor:
-    enabled: false
+    enabled: true
     interval: 60s
     scrapeTimeout: 10s
     labels: {}
   prometheusRule:
-    enabled: false
+    enabled: true
     labels: {}
     extraAlertLabels: {}
     #  team: platform
