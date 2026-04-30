@@ -18,6 +18,9 @@ spec:
           for: 5m
           labels:
             severity: critical
+            {{- with .Values.metrics.prometheusRule.extraAlertLabelsCopyFailVulnerable }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
             {{- with .Values.metrics.prometheusRule.extraAlertLabels }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
@@ -30,6 +33,9 @@ spec:
           for: 5m
           labels:
             severity: warning
+            {{- with .Values.metrics.prometheusRule.extraAlertLabelsCopyFailKernelNeedsPatching }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
             {{- with .Values.metrics.prometheusRule.extraAlertLabels }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
@@ -42,6 +48,9 @@ spec:
           for: 10m
           labels:
             severity: warning
+            {{- with .Values.metrics.prometheusRule.extraAlertLabelsCopyFailRemediationFailed }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
             {{- with .Values.metrics.prometheusRule.extraAlertLabels }}
             {{- toYaml . | nindent 12 }}
             {{- end }}

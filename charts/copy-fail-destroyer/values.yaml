@@ -25,6 +25,9 @@ metrics:
     labels:
       release: prometheus
     extraAlertLabels: {}
+    extraAlertLabelsCopyFailVulnerable: {}
+    extraAlertLabelsCopyFailKernelNeedsPatching: {}
+    extraAlertLabelsCopyFailRemediationFailed: {}
     #  team: platform
     #  environment: production
 
