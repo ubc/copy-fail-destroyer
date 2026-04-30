@@ -40,6 +40,7 @@ pkg/detector/
   probe_other.go               # Probe stub (non-Linux)
   remediate_linux.go           # Module unload via delete_module (Linux)
   remediate_other.go           # Remediation stub (non-Linux)
+deploy/namespace.yaml          # Namespace with Pod Security Admission policy
 deploy/daemonset.yaml          # Kubernetes DaemonSet manifest
 Dockerfile                     # Multi-stage build (scratch final image)
 ```
@@ -62,9 +63,15 @@ docker build -t copy-fail-destroyer .
 
 ## Deployment
 
-The agent must run as a **privileged** pod to unload kernel modules (`CAP_SYS_MODULE`). Deploy as a DaemonSet:
+The agent runs in a dedicated namespace with a `privileged` Pod Security Admission policy. The container itself is **not** fully privileged — it only requests the specific capabilities it needs:
+
+- `CAP_SYS_MODULE` — to unload `algif_aead` via `delete_module`
+- `CAP_NET_ADMIN` — to create `AF_ALG` sockets for probing
+
+All other capabilities are dropped, and the root filesystem is read-only.
 
 ```bash
+kubectl apply -f deploy/namespace.yaml
 kubectl apply -f deploy/daemonset.yaml
 ```
 

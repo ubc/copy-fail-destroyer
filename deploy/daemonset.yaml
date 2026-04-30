@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: copy-fail-destroyer
+  namespace: copy-fail-destroyer
   labels:
     app: copy-fail-destroyer
 spec:
@@ -16,7 +17,6 @@ spec:
         prometheus.io/scrape: "true"
         prometheus.io/port: "9100"
     spec:
-      hostPID: true
       containers:
         - name: destroyer
           image: ghcr.io/norskhelsenett/copy-fail-destroyer:latest
@@ -24,7 +24,15 @@ spec:
             - containerPort: 9100
               name: metrics
           securityContext:
-            privileged: true
+            runAsUser: 0
+            capabilities:
+              add:
+                - SYS_MODULE
+                - NET_ADMIN
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
           resources:
             requests:
               cpu: 10m
