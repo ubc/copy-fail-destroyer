@@ -1,0 +1,50 @@
+image:
+  repository: ghcr.io/ubc/copy-fail-destroyer
+  tag: "0.1.13"  # defaults to appVersion
+  pullPolicy: IfNotPresent
+
+resources:
+  requests:
+    cpu: 10m
+    memory: 32Mi
+  limits:
+    cpu: 50m
+    memory: 64Mi
+
+metrics:
+  port: 9100
+  prometheusScrape: true
+  podMonitor:
+    enabled: false
+    interval: 60s
+    scrapeTimeout: 10s
+    labels:
+      release: prometheus
+  prometheusRule:
+    enabled: false
+    namespace: prometheus-operator
+    labels:
+      release: prometheus
+    extraAlertLabels: {}
+    extraAlertLabelsCopyFailVulnerable: {}
+    extraAlertLabelsCopyFailKernelNeedsPatching: {}
+    extraAlertLabelsCopyFailRemediationFailed: {}
+    #  team: platform
+    #  environment: production
+
+# Remediation mode: "unload" (default), "blacklist" (unload + modprobe blacklist), or "disabled" (detect only)
+remediationMode: blacklist
+
+namespace:
+  create: true
+  podSecurityLabels: true
+
+tolerations:
+  - key: hub.jupyter.org/dedicated
+    operator: "Equal"
+    value: "user"
+    effect: "NoSchedule"
+  - key: node-role.kubernetes.io/master
+    effect: "NoSchedule"
+
+nodeSelector: {}
