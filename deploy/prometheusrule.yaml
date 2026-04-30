@@ -5,6 +5,7 @@ metadata:
   namespace: copy-fail-destroyer
   labels:
     app: copy-fail-destroyer
+    release: prometheus
 spec:
   groups:
     - name: copy-fail-destroyer
