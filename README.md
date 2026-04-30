@@ -69,3 +69,18 @@ kubectl apply -f deploy/daemonset.yaml
 ```
 
 The DaemonSet includes Prometheus scrape annotations (`prometheus.io/scrape: "true"`, port `9100`).
+
+## CI/CD
+
+A GitHub Actions workflow (`.github/workflows/build.yaml`) triggers on versioned tags (`v*`). It:
+
+1. Runs `go test ./...`
+2. Builds the Linux binary
+3. Builds and pushes a container image to `ghcr.io/norskhelsenett/copy-fail-destroyer`
+
+Tags are derived from the Git tag — e.g. pushing `v1.2.3` produces image tags `1.2.3` and `1.2`.
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
