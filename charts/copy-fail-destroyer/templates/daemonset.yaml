@@ -40,6 +40,11 @@ spec:
           volumeMounts:
             - name: modprobe
               mountPath: /host/run/modprobe.d
+            - name: lib-modules
+              mountPath: /host/lib/modules
+              {{- if ne .Values.remediationMode "remove" }}
+              readOnly: true
+              {{- end }}
       {{- with .Values.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
@@ -53,3 +58,7 @@ spec:
           hostPath:
             path: /run/modprobe.d
             type: DirectoryOrCreate
+        - name: lib-modules
+          hostPath:
+            path: /lib/modules
+            type: Directory

@@ -107,6 +107,20 @@ func check() {
 			if !applied {
 				remediationApplied.Set(0)
 			}
+		case "remove":
+			log.Printf("module reachable (%s), attempting unload + blacklist + remove", probeDetail)
+			unloaded, ulDetail := detector.UnloadAFALGModule()
+			log.Printf("remediation (unload): %s", ulDetail)
+			applied, blDetail := detector.BlacklistAFALGModule()
+			log.Printf("remediation (blacklist): %s", blDetail)
+			removed, rmDetail := detector.RemoveAFALGModuleFile()
+			log.Printf("remediation (remove): %s", rmDetail)
+			if unloaded && applied && removed {
+				remediationApplied.Set(1)
+				moduleReachable.Set(0)
+			} else {
+				remediationApplied.Set(0)
+			}
 		default:
 			log.Printf("unknown REMEDIATION_MODE %q, skipping remediation", mode)
 		}

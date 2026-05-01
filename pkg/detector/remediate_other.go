@@ -11,3 +11,8 @@ func UnloadAFALGModule() (unloaded bool, detail string) {
 func BlacklistAFALGModule() (applied bool, detail string) {
 	return false, "modprobe blacklist is only supported on Linux"
 }
+
+// RemoveAFALGModuleFile is a no-op on non-Linux platforms.
+func RemoveAFALGModuleFile() (removed bool, detail string) {
+	return false, "module file removal is only supported on Linux"
+}

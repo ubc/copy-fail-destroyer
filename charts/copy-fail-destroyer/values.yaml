@@ -32,7 +32,13 @@ metrics:
     #  team: platform
     #  environment: production
 
-# Remediation mode: "unload" (default), "blacklist" (unload + modprobe blacklist), or "disabled" (detect only)
+# Remediation mode:
+#   "unload"    (default) — delete_module algif_aead from the running kernel
+#   "blacklist"           — unload + write modprobe rule to block auto-reload
+#   "remove"              — unload + blacklist + delete the algif_aead.ko file
+#                           from /lib/modules so it cannot be loaded again,
+#                           even after a reboot. Mounts /lib/modules read-write.
+#   "disabled"            — detect only, no remediation
 remediationMode: unload
 
 namespace:
