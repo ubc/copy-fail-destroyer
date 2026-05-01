@@ -19,7 +19,7 @@ Set via the `REMEDIATION_MODE` environment variable (or `remediationMode` in the
 |---|---|
 | `unload` (default) | Unloads the `algif_aead` kernel module via `delete_module` |
 | `blacklist` | Unloads the module **and** writes a modprobe blacklist rule to prevent auto-reload |
-| `remove` | Unloads, blacklists, **and** deletes the `algif_aead.ko` file from `/lib/modules/$(uname -r)/...` so the module cannot be loaded again — even after a reboot or removal of the blacklist. Requires `/lib/modules` mounted read-write (the Helm chart does this automatically when this mode is set). Built-in modules cannot be removed this way. |
+| `remove` | Unloads, blacklists, **and** deletes the `algif_aead.ko` file from `/lib/modules/$(uname -r)/...` so the module cannot be loaded again — even after a reboot or removal of the blacklist. **Runs every cycle even when the module is currently unreachable** (e.g., already blocked by a blacklist) so a re-installed `.ko` file is caught on the next loop. Requires `/lib/modules` mounted read-write (the Helm chart does this automatically when this mode is set). Built-in modules cannot be removed this way. |
 | `disabled` | Detect and report only — no remediation is performed |
 
 ## Prometheus metrics

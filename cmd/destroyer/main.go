@@ -72,58 +72,67 @@ func check() {
 		moduleReachable.Set(0)
 	}
 
-	// Remediate: if the module is reachable, act based on REMEDIATION_MODE.
-	if reachable {
-		mode := strings.ToLower(strings.TrimSpace(os.Getenv("REMEDIATION_MODE")))
-		if mode == "" {
-			mode = "unload"
-		}
+	mode := strings.ToLower(strings.TrimSpace(os.Getenv("REMEDIATION_MODE")))
+	if mode == "" {
+		mode = "unload"
+	}
 
-		switch mode {
-		case "disabled":
-			log.Printf("module reachable (%s), remediation disabled by REMEDIATION_MODE", probeDetail)
-		case "unload":
-			log.Printf("module reachable (%s), attempting unload", probeDetail)
-			unloaded, detail := detector.UnloadAFALGModule()
-			log.Printf("remediation: %s", detail)
-			if unloaded {
-				remediationApplied.Set(1)
-				moduleReachable.Set(0)
-			} else {
-				remediationApplied.Set(0)
-			}
-		case "blacklist":
-			log.Printf("module reachable (%s), attempting unload + blacklist", probeDetail)
-			unloaded, detail := detector.UnloadAFALGModule()
-			log.Printf("remediation (unload): %s", detail)
-			if unloaded {
-				remediationApplied.Set(1)
-				moduleReachable.Set(0)
-			} else {
-				remediationApplied.Set(0)
-			}
-			applied, blDetail := detector.BlacklistAFALGModule()
-			log.Printf("remediation (blacklist): %s", blDetail)
-			if !applied {
-				remediationApplied.Set(0)
-			}
-		case "remove":
-			log.Printf("module reachable (%s), attempting unload + blacklist + remove", probeDetail)
-			unloaded, ulDetail := detector.UnloadAFALGModule()
-			log.Printf("remediation (unload): %s", ulDetail)
-			applied, blDetail := detector.BlacklistAFALGModule()
-			log.Printf("remediation (blacklist): %s", blDetail)
-			removed, rmDetail := detector.RemoveAFALGModuleFile()
-			log.Printf("remediation (remove): %s", rmDetail)
-			if unloaded && applied && removed {
-				remediationApplied.Set(1)
-				moduleReachable.Set(0)
-			} else {
-				remediationApplied.Set(0)
-			}
-		default:
-			log.Printf("unknown REMEDIATION_MODE %q, skipping remediation", mode)
+	// "remove" runs every cycle regardless of current reachability — its job
+	// is to keep algif_aead.ko off the host's disk so the module cannot be
+	// re-loaded later, even if the blacklist is removed or the system is
+	// rebooted. unload + blacklist are idempotent and safe to re-run.
+	if mode == "remove" {
+		log.Printf("remove mode: attempting unload + blacklist + remove (reachable=%v: %s)", reachable, probeDetail)
+		unloaded, ulDetail := detector.UnloadAFALGModule()
+		log.Printf("remediation (unload): %s", ulDetail)
+		applied, blDetail := detector.BlacklistAFALGModule()
+		log.Printf("remediation (blacklist): %s", blDetail)
+		removed, rmDetail := detector.RemoveAFALGModuleFile()
+		log.Printf("remediation (remove): %s", rmDetail)
+		if unloaded && applied && removed {
+			remediationApplied.Set(1)
+			moduleReachable.Set(0)
+		} else {
+			remediationApplied.Set(0)
 		}
+		return
+	}
+
+	// All other modes only remediate when the module is currently reachable.
+	if !reachable {
+		return
+	}
+
+	switch mode {
+	case "disabled":
+		log.Printf("module reachable (%s), remediation disabled by REMEDIATION_MODE", probeDetail)
+	case "unload":
+		log.Printf("module reachable (%s), attempting unload", probeDetail)
+		unloaded, detail := detector.UnloadAFALGModule()
+		log.Printf("remediation: %s", detail)
+		if unloaded {
+			remediationApplied.Set(1)
+			moduleReachable.Set(0)
+		} else {
+			remediationApplied.Set(0)
+		}
+	case "blacklist":
+		log.Printf("module reachable (%s), attempting unload + blacklist", probeDetail)
+		unloaded, detail := detector.UnloadAFALGModule()
+		log.Printf("remediation (unload): %s", detail)
+		if unloaded {
+			remediationApplied.Set(1)
+			moduleReachable.Set(0)
+		} else {
+			remediationApplied.Set(0)
+		}
+		applied, blDetail := detector.BlacklistAFALGModule()
+		log.Printf("remediation (blacklist): %s", blDetail)
+		if !applied {
+			remediationApplied.Set(0)
+		}
+	default:
+		log.Printf("unknown REMEDIATION_MODE %q, skipping remediation", mode)
 	}
 }
 
