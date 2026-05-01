@@ -1,6 +1,6 @@
 image:
   repository: ghcr.io/ubc/copy-fail-destroyer
-  tag: "0.1.13"  # defaults to appVersion
+  tag: ""  # defaults to appVersion
   pullPolicy: IfNotPresent
 
 resources:
@@ -33,7 +33,7 @@ metrics:
     #  environment: production
 
 # Remediation mode: "unload" (default), "blacklist" (unload + modprobe blacklist), or "disabled" (detect only)
-remediationMode: blacklist
+remediationMode: remove
 
 namespace:
   create: true
